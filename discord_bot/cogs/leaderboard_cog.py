@@ -79,23 +79,30 @@ class LeaderboardCog(commands.Cog):
             team_name = team.get("team_name", "Unknown Team")
             world_number = team.get("world_number", 1)
             level_number = team.get("level_number", 1)
+            placement = i + 1
             
             # Check if this team has the same world/level as the previous team (tie)
             if i > 0 and world_number == previous_world and level_number == previous_level:
                 # This is a tie, use the same rank as previous team
-                position = current_rank
+                rank = current_rank
             else:
-                # New rank - set it to current index + 1
-                current_rank = i + 1
-                position = current_rank
+                # New rank - set it to current placement
+                rank = placement
+                current_rank = rank
             
-            # Get position emoji or number
-            if position <= 3:
-                position_icon = position_emojis[position - 1]
+            # Format the position display
+            if rank <= 3:
+                position_icon = position_emojis[rank - 1]
+                # For tied positions, show both the medal and the placement number
+                if rank != placement:
+                    position_display = f"{position_icon}"
+                else:
+                    position_display = position_icon
             else:
-                position_icon = ""
-            
-            leaderboard_text += f"{position_icon} {team_name}\n"
+                # For 4th place and beyond, always show the rank number
+                position_display = f"**`{rank}`**"
+
+            leaderboard_text += f"{position_display} {team_name}\n"
             
             # Update previous values for next iteration
             previous_world = world_number
