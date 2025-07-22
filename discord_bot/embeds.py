@@ -68,7 +68,7 @@ def build_team_board_embed(team_data, tile_info, team_level_string, ranking=None
     )
     return embed
 
-def build_w1_key_board_embed(team_data):
+def build_w1_key_board_embed(team_data, ranking=None):
     embed = discord.Embed(
         title=team_data['team_name'],
         color=discord.Color.dark_purple()
@@ -80,6 +80,21 @@ def build_w1_key_board_embed(team_data):
         value="Complete 3 out of 5 trials to unlock the boss key!",
         inline=False
     )
+
+    if ranking:
+        rank_texts = {
+            1: "1st Place",
+            2: "2nd Place",
+            3: "3rd Place",
+            4: "4th Place",
+            5: "5th Place",
+            6: "6th Place",
+        }
+        embed.add_field(
+            name=f"{Emojis.TROPHY} Ranking",
+            value=rank_texts.get(ranking, "Unknown"),
+            inline=True
+        )
 
     trial_count = 0
     for counter in [team_data["w1key1_completion_counter"], 
@@ -135,7 +150,7 @@ def build_w1_key_board_embed(team_data):
     )
     return embed
 
-def build_w1_boss_board_embed(team_data):
+def build_w1_boss_board_embed(team_data, ranking=None):
     embed = discord.Embed(
         title=team_data['team_name'],
         color=discord.Color.dark_purple()
@@ -145,6 +160,20 @@ def build_w1_boss_board_embed(team_data):
         value=f"{Emojis.TWISTED_BOW} Obtain 1x CoX megarare or Metamorphic Dust - Twisted Bow, Kodai Insignia, Elder Maul, or Olmlet",
         inline=False
     )
+    if ranking:
+        rank_texts = {
+            1: "1st Place",
+            2: "2nd Place",
+            3: "3rd Place",
+            4: "4th Place",
+            5: "5th Place",
+            6: "6th Place",
+        }
+        embed.add_field(
+            name=f"{Emojis.TROPHY} Ranking",
+            value=rank_texts.get(ranking, "Unknown"),
+            inline=True
+        )
     embed.add_field(
         name=f"{Emojis.SUBMISSIONS} Submissions Remaining",
         value="1",

@@ -91,9 +91,9 @@ class PlayerCog(commands.Cog):
                     if int(team_data["game_state"]) == 0:
                         embed = build_team_board_embed(team_data, board_information["tile"], board_information["level_number"], board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 1:
-                        embed = build_w1_key_board_embed(team_data)
+                        embed = build_w1_key_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 1:
-                        embed = build_w1_boss_board_embed(team_data)
+                        embed = build_w1_boss_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 2:
                         embed = build_w2_key_board_embed(team_data)
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 2:

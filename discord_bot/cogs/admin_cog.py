@@ -529,12 +529,12 @@ class AdminCog(commands.Cog):
             return build_team_board_embed(team_data, board_information["tile"], board_information["level_number"], board_information["placement"])
         elif game_state == 1:
             if current_world == 1:
-                return build_w1_key_board_embed(team_data)
+                return build_w1_key_board_embed(team_data, board_information["placement"])
             elif current_world == 2:
                 return build_w2_key_board_embed(team_data)
         elif game_state == 2:
             if current_world == 1:
-                return build_w1_boss_board_embed(team_data)
+                return build_w1_boss_board_embed(team_data, board_information["placement"])
             elif current_world == 2:
                 return build_w2_boss_board_embed(team_data)
         
@@ -565,6 +565,9 @@ class AdminCog(commands.Cog):
     async def send_team_board_to_interaction(self, interaction: discord.Interaction, team_data: Dict, board_information: Dict) -> None:
         """Send a team board as an interaction response"""
         try:
+            # Defer the response if the API might take a while
+            if not interaction.response.is_done():
+                await interaction.response.defer()
             async with self.session.get(ApiUrls.IMAGE_BOARD.format(id=team_data["_id"])) as resp:
                 if resp.status == 200:
                     image_data = await resp.read()
@@ -572,9 +575,9 @@ class AdminCog(commands.Cog):
                     if int(team_data["game_state"]) == 0:
                         embed = build_team_board_embed(team_data, board_information["tile"], board_information["level_number"], board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 1:
-                        embed = build_w1_key_board_embed(team_data)
+                        embed = build_w1_key_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 1:
-                        embed = build_w1_boss_board_embed(team_data)
+                        embed = build_w1_boss_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 2:
                         embed = build_w2_key_board_embed(team_data)
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 2:
@@ -588,12 +591,12 @@ class AdminCog(commands.Cog):
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 4:
                         embed = build_w4_boss_board_embed(team_data)
                     else:
-                        await interaction.response.send_message(f"Error. Contact <@{DiscordIDs.TANGY_DISCORD_ID}>")
+                        await interaction.followup.send(f"Error. Contact <@{DiscordIDs.TANGY_DISCORD_ID}>")
                         return
                     embed.set_image(url="attachment://team_board.png")
-                    await interaction.response.send_message(embed=embed, file=file)
+                    await interaction.followup.send(embed=embed, file=file)
                 else:
-                    await interaction.response.send_message(f"There was an error getting your board image. Please contact <@{DiscordIDs.TANGY_DISCORD_ID}>")
+                    await interaction.followup.send(f"There was an error getting your board image. Please contact <@{DiscordIDs.TANGY_DISCORD_ID}>")
         except Exception as e:
             print(f"Error in send_team_board_to_interaction: {e}")
             await interaction.response.send_message("There was an error displaying the board.")
