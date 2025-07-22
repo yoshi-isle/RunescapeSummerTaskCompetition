@@ -731,6 +731,34 @@ def get_team_placement(team_id):
     })
 
 
+@teams_blueprint.route("/teams/all_placements", methods=["GET"])
+def get_all_team_placements():
+    """
+    Get the placement/ranking of all teams in the leaderboard.
+    Returns all teams with their positions and team names.
+    """
+    db = get_db()
+    
+    # Get all teams
+    teams = list(db.teams.find({}))
+    
+    # Calculate placement for each team
+    team_placements = []
+    for team in teams:
+        team_id = str(team["_id"])
+        placement = calculate_team_placement(team_id, teams)
+        
+        team_placements.append({
+            "team_name": team.get("team_name", "Unknown"),
+            "placement": placement
+        })
+    
+    # Sort by placement
+    team_placements.sort(key=lambda x: x["placement"])
+    
+    return jsonify(team_placements)
+
+
 @teams_blueprint.route("/teams", methods=["GET"])
 def get_all_teams():
     """

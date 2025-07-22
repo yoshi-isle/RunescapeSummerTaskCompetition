@@ -25,7 +25,7 @@ class LeaderboardCog(commands.Cog):
             return
 
         try:
-            teams = await self.fetch_all_teams()
+            teams = await self.fetch_all_team_placements()
             if teams:
                 embed = self.create_leaderboard_embed(teams)
                 await self.leaderboard_message.edit(embed=embed)
@@ -37,6 +37,20 @@ class LeaderboardCog(commands.Cog):
     async def before_update_leaderboard(self):
         """Wait until the bot is ready before starting the loop"""
         await self.bot.wait_until_ready()
+
+    async def fetch_all_team_placements(self):
+        """Fetch all teams with their placements from the API"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(ApiUrls.TEAM_ALL_PLACEMENTS) as response:
+                    if response.status == 200:
+                        return await response.json()
+                    else:
+                        logging.error(f"Failed to fetch team placements: {response.status}")
+                        return []
+        except Exception as e:
+            logging.error(f"Error fetching team placements: {e}")
+            return []
 
     async def fetch_all_teams(self):
         """Fetch all teams from the API"""
@@ -72,17 +86,14 @@ class LeaderboardCog(commands.Cog):
         position_emojis = ["🥇", "🥈", "🥉"]
         
         current_rank = 1
-        previous_world = None
-        previous_level = None
+        previous_placement = None
         
         for i, team in enumerate(teams):
             team_name = team.get("team_name", "Unknown Team")
-            world_number = team.get("world_number", 1)
-            level_number = team.get("level_number", 1)
-            placement = i + 1
+            placement = team.get("placement", i + 1)
             
-            # Check if this team has the same world/level as the previous team (tie)
-            if i > 0 and world_number == previous_world and level_number == previous_level:
+            # Check if this team has the same placement as the previous team (tie)
+            if i > 0 and placement == previous_placement:
                 # This is a tie, use the same rank as previous team
                 rank = current_rank
             else:
@@ -93,20 +104,15 @@ class LeaderboardCog(commands.Cog):
             # Format the position display
             if rank <= 3:
                 position_icon = position_emojis[rank - 1]
-                # For tied positions, show both the medal and the placement number
-                if rank != placement:
-                    position_display = f"{position_icon}"
-                else:
-                    position_display = position_icon
+                position_display = position_icon
             else:
-                # For 4th place and beyond, always show the rank number
+                # For 4th place and beyond, show the rank number
                 position_display = f"**`{rank}`**"
 
             leaderboard_text += f"{position_display} {team_name}\n"
             
-            # Update previous values for next iteration
-            previous_world = world_number
-            previous_level = level_number
+            # Update previous placement for next iteration
+            previous_placement = placement
             
         embed.add_field(
             name="", 
@@ -121,7 +127,7 @@ class LeaderboardCog(commands.Cog):
     @discord.app_commands.checks.has_role("Admin")
     async def create_leaderboard(self, interaction: discord.Interaction):
         """Create a new leaderboard message in the current channel"""
-        teams = await self.fetch_all_teams()
+        teams = await self.fetch_all_team_placements()
         embed = self.create_leaderboard_embed(teams)
         
         message = await interaction.channel.send(embed=embed)
@@ -147,7 +153,7 @@ class LeaderboardCog(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         
         try:
-            teams = await self.fetch_all_teams()
+            teams = await self.fetch_all_team_placements()
             if teams:
                 embed = self.create_leaderboard_embed(teams)
                 await self.leaderboard_message.edit(embed=embed)
@@ -167,7 +173,7 @@ class LeaderboardCog(commands.Cog):
             self.leaderboard_channel_id = interaction.channel.id
             
             # Update the message immediately
-            teams = await self.fetch_all_teams()
+            teams = await self.fetch_all_team_placements()
             embed = self.create_leaderboard_embed(teams)
             await message.edit(embed=embed)
             
