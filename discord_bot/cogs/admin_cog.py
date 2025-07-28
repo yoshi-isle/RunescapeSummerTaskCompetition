@@ -203,7 +203,6 @@ class AdminCog(commands.Cog):
         # Get submission data
         submission, game_state = await self._get_submission_by_type(str(message.id))
         if not submission:
-            await channel.send(f"Submission not found in database for Message ID {message.id}")
             return
         
         # Handle reactions
@@ -322,7 +321,16 @@ class AdminCog(commands.Cog):
                 await self.session.put(ApiUrls.TEAM_COMPLETE_W2_TRIAL.format(id=team["_id"]))
                 await post_team_board(self.session, submission['team_id'], team_channel, "overworld")
             else:
-                await team_channel.send(f"progress {team[f'w2key{key_option}_completion_counter']} remaining")
+                embed = Embed(
+                    title=f"{Emojis.CHECKMARK_GIF} Progress updated on the trial!",
+                    description="*A lock clicks open on the chest...*",
+                    color=discord.Color.dark_purple()
+                )
+                embed.add_field(
+                    name="Progress",
+                    value=f"You still need to submit {remaining} more to unlock it."
+                )
+                await team_channel.send(embed=embed)
 
     async def _handle_world3_key_approval(self, submission: Dict, team: Dict, team_channel: discord.TextChannel) -> None:
         """Handle World 3 key submission approval (light a brazier)"""
@@ -405,6 +413,8 @@ class AdminCog(commands.Cog):
 
                     await team_channel.send(embed=Embed(title=f"{Emojis.TRIAL_COMPLETE} Your team completed the boss tile!"))
                     await self._advance_to_next_world(team, submission, team_channel)
+                else:
+                    await team_channel.send(embed=Embed(title=f"{Emojis.CHECKMARK_GIF} Progress updated on the boss! You still need to complete {team[f'w{world}boss_completion_counter']} more submissions to complete it."))
 
     async def _advance_to_next_world(self, team: Dict, submission: Dict, team_channel: discord.TextChannel) -> None:
         """Advance team to next world after boss completion"""
@@ -531,12 +541,12 @@ class AdminCog(commands.Cog):
             if current_world == 1:
                 return build_w1_key_board_embed(team_data, board_information["placement"])
             elif current_world == 2:
-                return build_w2_key_board_embed(team_data)
+                return build_w2_key_board_embed(team_data, board_information["placement"])
         elif game_state == 2:
             if current_world == 1:
                 return build_w1_boss_board_embed(team_data, board_information["placement"])
             elif current_world == 2:
-                return build_w2_boss_board_embed(team_data)
+                return build_w2_boss_board_embed(team_data, board_information["placement"])
         
         # Default fallback
         return build_team_board_embed(team_data, board_information["tile"], board_information["level_number"], board_information["placement"])
@@ -579,9 +589,9 @@ class AdminCog(commands.Cog):
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 1:
                         embed = build_w1_boss_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 2:
-                        embed = build_w2_key_board_embed(team_data)
+                        embed = build_w2_key_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 2:
-                        embed = build_w2_boss_board_embed(team_data)
+                        embed = build_w2_boss_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 3:
                         embed = build_w3_key_board_embed(team_data)
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 3:

@@ -90,6 +90,8 @@ class ApiUrls:
 
     TEAM_PLACEMENT = f"{BASE_URL}/teams/{{id}}/placement"
 
+    ADD_TO_SPECIALTY_TEAM = f"{BASE_URL}/teams/add_user/{{discord_id}}"
+
     # Submissions
     SUBMISSION = f"{BASE_URL}/submission/{{id}}"
     KEY_SUBMISSION = f"{BASE_URL}/key_submission/{{id}}"

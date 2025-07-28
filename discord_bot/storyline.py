@@ -51,14 +51,14 @@ A powerful voice reverberates through the stone:
     W2_KEY_COMPLETE = {
         "title": "Chapter 2-T: The Trials of Tumeken - Complete",
         "dialogue": '''
-With the final puzzle solved, the chest is found empty—yet a hidden mechanism clicks into place.
+With the final puzzle solved, the chest is found empty-yet a hidden mechanism clicks into place.
 Ancient gears grind, and the desert fog begins to lift.
 As the dust clears, a grand colosseum emerges—its sunlit arches inviting the heroes onward.
 
 A weary voice echoes from within the pyramid:
 "Forgive me for conjuring this storm. I only wished to protect the oasis from... him."
 
-Undeterred, the heroes advance.
+Undeterred, the heroes advance towards the true challenge.
 '''
     }
 

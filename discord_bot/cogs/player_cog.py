@@ -95,9 +95,9 @@ class PlayerCog(commands.Cog):
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 1:
                         embed = build_w1_boss_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 2:
-                        embed = build_w2_key_board_embed(team_data)
+                        embed = build_w2_key_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 2:
-                        embed = build_w2_boss_board_embed(team_data)
+                        embed = build_w2_boss_board_embed(team_data, board_information["placement"])
                     elif int(team_data["game_state"]) == 1 and int(team_data["current_world"]) == 3:
                         embed = build_w3_key_board_embed(team_data)
                     elif int(team_data["game_state"]) == 2 and int(team_data["current_world"]) == 3:
@@ -226,7 +226,7 @@ class PlayerCog(commands.Cog):
                         app_commands.Choice(name="Any CoX Mega-rare or Dust", value=1),
                     ],
                     2: [
-                        app_commands.Choice(name="Tonalztics of Ralos", value=1),
+                        app_commands.Choice(name="12x Echo Crystals OR Tonalztics of Ralos", value=1),
                     ],
                     3: [
                         app_commands.Choice(name="ZCB from scratch", value=1),
@@ -319,7 +319,7 @@ class PlayerCog(commands.Cog):
             async with self.session.post(ApiUrls.CREATE_BOSS_SUBMISSION, json=submission_data) as sub_resp:
                 if sub_resp.status != 201:
                     error = await sub_resp.text()
-                    await interaction.followup.send(f"Failed to create submission in API: {error}")
+                    await interaction.followup.send(f"Failed to create submission in API")
             return
 
         # Get the current tile from the API
@@ -387,7 +387,7 @@ class PlayerCog(commands.Cog):
                 async with self.session.post(ApiUrls.CREATE_SUBMISSION, json=submission_data) as sub_resp:
                     if sub_resp.status != 201:
                         error = await sub_resp.text()
-                        await interaction.followup.send(f"Failed to create submission in API: {error}")
+                        await interaction.followup.send(f"Failed to create submission in API")
             else:
                 await interaction.followup.send("Pending submissions channel not found. Please contact an admin.", ephemeral=True)
                 return
@@ -464,7 +464,39 @@ class PlayerCog(commands.Cog):
             async with self.session.post(ApiUrls.CREATE_KEY_SUBMISSION, json=submission_data) as sub_resp:
                 if sub_resp.status != 201:
                     error = await sub_resp.text()
-                    await interaction.followup.send(f"Failed to create submission in API: {error}")
+                    await interaction.followup.send(f"Failed to create submission in API")
+
+    @app_commands.command(name="i_wanna_play", description="Add yourself to the team!")
+    async def add_to_specialty_team(self, interaction: discord.Interaction):
+        try:
+            if await game_hasnt_started(self.session):
+                await interaction.response.send_message("Bingo hasn't started yet.")
+                return
+            await interaction.response.defer(ephemeral=True)
+            async with self.session.put(ApiUrls.ADD_TO_SPECIALTY_TEAM.format(discord_id=interaction.user.id)) as resp:
+                if resp.status == 200:
+                    # add the role by role id
+                    guild = self.bot.get_guild(DiscordIDs.GUILD_ID)
+                    if guild:
+                        role = guild.get_role(1390739400803090473)  # role ID as int, not str
+                        if role:
+                            member = guild.get_member(interaction.user.id)
+                            if member:
+                                await member.add_roles(role)
+                            else:
+                                await interaction.followup.send("Member not found in guild.", ephemeral=True)
+                                return
+                        else:
+                            await interaction.followup.send("Role not found", ephemeral=True)
+                            return
+                    else:
+                        await interaction.followup.send("Guild not found", ephemeral=True)
+                        return
+                    await interaction.followup.send(f"You have been added to the team!", ephemeral=True)
+                else:
+                    await interaction.followup.send("Failed to add you to the team", ephemeral=True)
+        except Exception as e:
+            await interaction.followup.send(f"An error occurred", ephemeral=True)
 
     @app_commands.command(name="skip", description="Skip the current tile.")
     async def skip(self, interaction: discord.Interaction):

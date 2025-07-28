@@ -45,11 +45,11 @@ async def post_team_board(session: aiohttp.ClientSession, team_id: str, team_cha
     elif board_type == "w1_key":
         embed = build_w1_key_board_embed(team_data, info.get("placement"))
     elif board_type == "w2_key":
-        embed = build_w2_key_board_embed(team_data)
+        embed = build_w2_key_board_embed(team_data, info.get("placement"))
     elif board_type == "w1_boss":
         embed = build_w1_boss_board_embed(team_data, info.get("placement"))
     elif board_type == "w2_boss":
-        embed = build_w2_boss_board_embed(team_data)
+        embed = build_w2_boss_board_embed(team_data, info.get("placement"))
     elif board_type == "w3_key":
         embed = build_w3_key_board_embed(team_data)
     elif board_type == "w3_boss":

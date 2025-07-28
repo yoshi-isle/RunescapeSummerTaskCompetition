@@ -47,7 +47,7 @@ world2_tiles = {
         {"id": 12, "tile_name": "Cat mask", "description": "Obtain 1x Cat mask from a Medium clue scroll", "completion_counter": 1, "image_url": "world2/tiles/12.png", "wiki_url": "https://oldschool.runescape.wiki/w/Cat_mask"},
         {"id": 13, "tile_name": "2x Pharaoh's Sceptre", "description": "Obtain 2x Pharaoh's Sceptres", "completion_counter": 2, "image_url": "world2/tiles/13.png", "wiki_url": "https://oldschool.runescape.wiki/w/Pharaoh's_Sceptre"},
         {"id": 14, "tile_name": "Any dye from GOTR", "description": "Obtain 1x dye from GOTR", "completion_counter": 1, "image_url": "world2/tiles/14.png", "wiki_url": "https://oldschool.runescape.wiki/w/guardian_of_the_rift"},
-        {"id": 15, "tile_name": "Jogre Champion Scroll", "description": "Obtain 1x Jogre Champion Scroll", "completion_counter": 1, "image_url": "world2/tiles/15.png", "wiki_url": "https://oldschool.runescape.wiki/w/Jogre_Champion_Scroll"},
+        {"id": 15, "tile_name": "Jogre Champion Scroll", "description": "Obtain 1x Jogre Champion Scroll", "completion_counter": 1, "image_url": "world2/tiles/15.png", "wiki_url": "https://oldschool.runescape.wiki/w/Jogre_champion_scroll"},
         {"id": 16, "tile_name": "Dark Bow + Whip", "description": "Obtain 1x Dark Bow and 1x Whip", "completion_counter": 2, "image_url": "world2/tiles/16.png", "wiki_url": "https://oldschool.runescape.wiki/w/Dark_Bow"},
     ],
     "key_tiles": [
@@ -58,7 +58,7 @@ world2_tiles = {
         {"id": 4, "tile_name": "3x Weapons from CoX/ToB/ToA", "description": "", "completion_counter": 3, "image_url": "world3/keys/4.png", "wiki_url": ""},
     ],
     "boss_tile":
-        {"id": 0, "tile_name": "Tonalztics of ralos", "description": "Obtain 1x Tonalztics of Ralos OR Smol Heredit from the Fortis Colosseum", "completion_counter": 1, "image_url": "world3/boss/0.png", "wiki_url": ""},
+        {"id": 0, "tile_name": "12x Echo Crystals OR Ralos", "description": "Obtain 12x Echo Crystals OR Tonalztics of Ralos OR Smol Heredit from the Fortis Colosseum", "completion_counter": 1, "image_url": "world3/boss/0.png", "wiki_url": ""},
 }
 
 world3_tiles = {

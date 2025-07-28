@@ -69,6 +69,22 @@ def create_team():
         inserted_team["_id"] = str(inserted_team["_id"])
     return jsonify(inserted_team), 201
 
+@teams_blueprint.route("/teams/add_user/<discord_id>", methods=["PUT"])
+def add_user_to_specialty_team(discord_id):
+    specialty_team_id = '6886c9a393e13c0943dc3e34'
+    db = get_db()
+    team = db.teams.find_one({"_id": ObjectId(specialty_team_id)})
+    if not team:
+        abort(404, description="Team not found")
+
+    # Add the user to the specialty team
+    db.teams.update_one(
+        {"_id": ObjectId(specialty_team_id)},
+        {"$addToSet": {"players": {"discord_id": discord_id}}}
+    )
+
+    return jsonify({"message": "User added to specialty team"}), 200
+
 @teams_blueprint.route("/teams/<team_name>", methods=["GET"])
 def get_team(team_name):
     """
@@ -160,8 +176,10 @@ def get_teams_in_first_place(teams):
             level = 1
         
         game_state = team.get("game_state", 0)
-        effective_game_state = get_effective_game_state(game_state, current_world)
-        
+        w2path = team.get("w2_path_chosen", 0)
+        w3_braziers_lit = team.get("w3_braziers_lit", 0)
+        effective_game_state = get_effective_game_state(game_state, current_world, w2path, w3_braziers_lit)
+
         # Check if this team has a better position
         if (current_world > best_world or 
             (current_world == best_world and level > best_level) or
@@ -183,8 +201,10 @@ def get_teams_in_first_place(teams):
             level = 1
         
         game_state = team.get("game_state", 0)
-        effective_game_state = get_effective_game_state(game_state, current_world)
-        
+        w2path = team.get("w2_path_chosen", 0)
+        w3_braziers_lit = team.get("w3_braziers_lit", 0)
+        effective_game_state = get_effective_game_state(game_state, current_world, w2path, w3_braziers_lit)
+
         if (current_world == best_world and level == best_level and effective_game_state == best_game_state):
             first_place_teams.add(str(team["_id"]))
     
@@ -358,7 +378,8 @@ def advance_to_boss_tile(team_id):
     db.teams.update_one(
         {"_id": ObjectId(team_id)}, 
         {"$set": 
-         {"game_state": 2}
+         {"game_state": 2,
+         "last_rolled_at": datetime.now(timezone.utc)}
         })
         # Convert ObjectId to string for JSON serialization
     if "_id" in team:
@@ -661,7 +682,8 @@ def advance_to_next_world(team_id):
         {"game_state": 0,
          "current_world": next_world,
          "current_tile": next_world_shuffled_tiles[0],
-         "completion_counter": completion_counter}
+         "completion_counter": completion_counter,
+         "last_rolled_at": datetime.now(timezone.utc)}
     })
     # Convert ObjectId to string for JSON serialization
     if "_id" in team:
@@ -838,13 +860,44 @@ def sync_reroll_timers():
         "timestamp": datetime.now(timezone.utc).isoformat()
     }), 200
 
-def get_effective_game_state(game_state, world):
+def get_effective_game_state(game_state, world, w2_path_chosen=None, w3_braziers_lit=None):
     """
-    Adjust game state for world 3 (exclude game state 1 checks)
-    For world 3, treat game state 1 as 0, but keep game state 2 as 2
+    Adjust game state for world 2 and world 3 for placement calculation.
+    For world 2:
+      - If game_state == 1, return 1.
+      - If game_state == 0 and w2_path_chosen == 2, return 3 (done with mini boss).
+      - If game_state == 2, return 4.
+    For world 3:
+      - Treat game_state 1 as 0, but keep game_state 2 as 2.
+    For other worlds, return game_state.
     """
-    if world == 3 and game_state == 1:
-        return 0  # Treat game state 1 as 0 for world 3
+    if world == 2:
+        if game_state == 2:
+            return 4
+        if game_state == 1:
+            return 1
+        if game_state == 0 and w2_path_chosen == 2:
+            return 3
+        return game_state
+    if world == 3:
+        # World 3 trial/brazier logic for placement calculation
+        # There are up to 3 braziers to light, so handle all cases up to 3
+        if game_state == 1 and (w3_braziers_lit == 0 or w3_braziers_lit is None):
+            return 1
+        if game_state == 0 and w3_braziers_lit == 1:
+            return 2
+        if game_state == 1 and w3_braziers_lit == 1:
+            return 3
+        if game_state == 0 and w3_braziers_lit == 2:
+            return 4
+        if game_state == 1 and w3_braziers_lit == 2:
+            return 5
+        if game_state == 0 and w3_braziers_lit == 3:
+            return 6
+        if game_state == 1:
+            return 0
+        if game_state == 2:
+            return 7
     return game_state
 
 def calculate_team_placement(target_team_id, teams):
@@ -890,16 +943,21 @@ def calculate_team_placement(target_team_id, teams):
     target_world_number = target_world
     target_level_number = target_level
     target_game_state = target_team.get("game_state", 0)
-    target_effective_game_state = get_effective_game_state(target_game_state, target_world_number)
-    
+    target_w2path = target_team.get("w2_path_chosen", 0)
+    target_w3_braziers_lit = target_team.get("w3_braziers_lit", 0)
+
+    target_effective_game_state = get_effective_game_state(target_game_state, target_world_number, target_w2path, target_w3_braziers_lit)
+
     # Count how many teams are ahead of the target team
     teams_ahead = 0
     for team in teams:
         team_world = team["world_number"]
         team_level = team["level_number"]
+        w2path = team["w2_path_chosen"]
+        w3_braziers_lit = team["w3_braziers_lit"]
         team_game_state = team.get("game_state", 0)
-        team_effective_game_state = get_effective_game_state(team_game_state, team_world)
-        
+        team_effective_game_state = get_effective_game_state(team_game_state, team_world, w2path, w3_braziers_lit)
+
         # If this team is ahead (higher world or same world but higher level or same world/level but higher game state)
         if (team_world > target_world_number or 
             (team_world == target_world_number and team_level > target_level_number) or

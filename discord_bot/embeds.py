@@ -187,7 +187,7 @@ def build_w1_boss_board_embed(team_data, ranking=None):
     embed.set_footer(text="Use /submit in your team channel to submit your boss tile completion.", icon_url=Emojis.SKW_LOGO)
     return embed
 
-def build_w2_key_board_embed(team_data):
+def build_w2_key_board_embed(team_data, ranking=None):
     embed = discord.Embed(
         title=team_data['team_name']
     )
@@ -198,6 +198,20 @@ def build_w2_key_board_embed(team_data):
         value="Navigate your way through the perilous tombs...",
         inline=False
     )
+    if ranking:
+        rank_texts = {
+            1: "1st Place",
+            2: "2nd Place",
+            3: "3rd Place",
+            4: "4th Place",
+            5: "5th Place",
+            6: "6th Place",
+        }
+        embed.add_field(
+            name=f"{Emojis.TROPHY} Ranking",
+            value=rank_texts.get(ranking, "Unknown"),
+            inline=True
+        )
     w2_path_chosen = team_data.get("w2_path_chosen", 0)
     if w2_path_chosen == 0:
         embed.add_field(
@@ -212,13 +226,13 @@ def build_w2_key_board_embed(team_data):
         )
         embed.add_field(
             name=f"**Trial 1-B: {Emojis.TRIAL_W2_2} Golden Pheasant egg**",
-            value=f"`{format_submission(team_data['w2key2_completion_counter'])}`",
+            value=f"(Can purchase from shop)\n`{format_submission(team_data['w2key2_completion_counter'])}`",
             inline=False
         )
     elif w2_path_chosen == 1:
         embed.add_field(
             name=f"**Trial 2: {Emojis.TRIAL_W2_4} 3x Cerberus Crystals**",
-            value=f"`{format_submission(team_data['w2key4_completion_counter'])}`",
+            value=f"*Smouldering Stone counts too*\n`{format_submission(team_data['w2key4_completion_counter'])}`",
             inline=False
         )
     elif w2_path_chosen == -1:
@@ -229,8 +243,8 @@ def build_w2_key_board_embed(team_data):
         )
     elif w2_path_chosen == 2:
         embed.add_field(
-            name=f"**Trial 3: {Emojis.TRIAL_W2_5} 3x Weapons from CoX/ToB/ToA**\n*Ghrazi Rapier, Scythe of Vitur, Sanguinesti Staff, Osmumten's Fang, Tumeken's Shadow, Twisted Bow, Kodai Wand, Elder Maul, Dinh's Bulwark, Dragon Hunter Crossbow, Dragon Claws*",
-            value=f"`{format_submission(team_data['w2key5_completion_counter'])}`",
+            name=f"**Trial 3: {Emojis.TRIAL_W2_5} 3x Weapons from CoX/ToB/ToA**",
+            value=f"Ghrazi Rapier, Scythe of Vitur, Sanguinesti Staff, Osmumten's Fang, Tumeken's Shadow, Twisted Bow, Kodai Wand, Elder Maul, Dinh's Bulwark, Dragon Hunter Crossbow, Dragon Claws*\n`{format_submission(team_data['w2key5_completion_counter'])}`",
             inline=False
         )
         embed.add_field(
@@ -240,16 +254,30 @@ def build_w2_key_board_embed(team_data):
         )
     return embed
 
-def build_w2_boss_board_embed(team_data):
+def build_w2_boss_board_embed(team_data, ranking=None):
     embed = discord.Embed(
         title=team_data['team_name'],
         color=discord.Color.yellow()
     )
     embed.add_field(
         name=f"{Emojis.VARLAMORE_FLAG}  2-B: Eclipse of the Sun",
-        value=f"{Emojis.RALOS} Obtain 1x Tonalztics of Ralos",
+        value=f"{Emojis.RALOS} Obtain 12x Echo Crystals OR 1x Tonalztics of Ralos",
         inline=False
     )
+    if ranking:
+        rank_texts = {
+            1: "1st Place",
+            2: "2nd Place",
+            3: "3rd Place",
+            4: "4th Place",
+            5: "5th Place",
+            6: "6th Place",
+        }
+        embed.add_field(
+            name=f"{Emojis.TROPHY} Ranking",
+            value=rank_texts.get(ranking, "Unknown"),
+            inline=True
+        )
     embed.add_field(
         name=f"{Emojis.SUBMISSIONS} Submissions Remaining",
         value=f"{team_data['w2boss_completion_counter']}",
@@ -289,13 +317,13 @@ def build_w3_key_board_embed(team_data):
         )    
     if w3_braziers_lit == 1:
         embed.add_field(
-            name=f"**{Emojis.TRIAL_W3_3} Trial 2-A: Granite Man**\nGranite helmet, body, legs, weapon, shield, ring, boots, gloves.\n*(2h counts for weapon + shield)*",
-            value=f"`{format_submission(team_data['w3key3_completion_counter'])}`",
+            name=f"**{Emojis.TRIAL_W3_3} Trial 2-A: Granite Man**",
+            value=f"Granite helmet, body, legs, weapon, shield, ring, boots, gloves.\n*(2h counts for weapon + shield)*\n`{format_submission(team_data['w3key3_completion_counter'])}`",
             inline=False
         )
         embed.add_field(
-            name=f"**{Emojis.TRIAL_W3_4} Trial 2-B: Raid Man**\nRaid unique helmet slot, chestplate, legs, weapon, ring, and shield.\n*(2h counts for weapon + shield)*",
-            value=f"`{format_submission(team_data['w3key4_completion_counter'])}`",
+            name=f"**{Emojis.TRIAL_W3_4} Trial 2-B: Raid Man (Build-a-kitten workshop)**",
+            value=f"Raid unique helmet slot, chestplate, legs, weapon, ring, and shield.\n*(2h counts for weapon + shield)*\n`{format_submission(team_data['w3key4_completion_counter'])}`",
             inline=False
         )
     if w3_braziers_lit == 2:
