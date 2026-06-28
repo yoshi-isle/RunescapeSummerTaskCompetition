@@ -9,8 +9,6 @@ An external game I made for my community of 400+ members.
 [![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
 
-[🎮 Features](#features) • [🏗️ Architecture](#architecture) • [🚀 Quick Start](#quick-start) • [📚 Documentation](#documentation)
-
 </div>
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/dc12903e-8a69-4cc5-8222-e6110b09734d" />
