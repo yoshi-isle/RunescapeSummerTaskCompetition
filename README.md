@@ -3,6 +3,9 @@ An external game I made for my community of 400+ members.
 The idea is an integration of this service within a team's discord channel. The image is a super mario world inspired progress window that directs them through a customizable list of generated tasks across 4 worlds.
 
 The result was a successful event with 100% uptime and great feedback from my community!
+
+How does it work? Refer to the image below. In this example, the team (~15 members) must work together to obtain 6 Enhanced Crystal Teleport Seeds within in MMORPG "Oldschool Runescape". Once they're done, they submit their progress via this Discord bot and an admin approves it. Following this, they advance in the world, and a new image is generated showing their next "level".
+
 <div align="center">
 
 [![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/your-server)
