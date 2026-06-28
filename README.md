@@ -1,6 +1,8 @@
 # Oldschool Runescape "World" Style Task Generator
 An external game I made for my community of 400+ members.
+The idea is an integration of this service within a team's discord channel. The image is a super mario world inspired progress window that directs them through a customizable list of generated tasks across 4 worlds.
 
+The result was a successful event with 100% uptime and great feedback from my community!
 <div align="center">
 
 [![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/your-server)
